@@ -1,0 +1,207 @@
+public class Collections {
+ 2     private static Random r;
+ 3     private static final int SHUFFLE_THRESHOLD        =    5;
+ 4     
+ 5     public static void shuffle(List<?> list) {
+ 6         if (r == null) {
+ 7             r = new Random();
+ 8         }
+ 9         shuffle(list, r);
+10     }
+11     
+12     public static void shuffle(List<?> list, Random rnd) {
+13         int size = list.size();
+14         if (size < SHUFFLE_THRESHOLD || list instanceof RandomAccess) {
+15             for (int i = size; i > 1; i--)
+16                 swap(list, i - 1, rnd.nextInt(i));
+17         } else {
+18             Object arr[] = list.toArray();
+19 
+20             // Shuffle array
+21             for (int i = size; i > 1; i--)
+22                 swap(arr, i - 1, rnd.nextInt(i));
+23 
+24             // Dump array back into list
+25             ListIterator it = list.listIterator();
+26             for (int i = 0; i < arr.length; i++) {
+27                 it.next();
+28                 it.set(arr[i]);
+29             }
+30         }
+31     }
+32     
+33     public static void swap(List<?> list, int i, int j) {
+34         final List l = list;
+35         l.set(i, l.set(j, l.get(i)));
+36     }
+37     
+38     private static void swap(Object[] arr, int i, int j) {
+39         Object tmp = arr[i];
+40         arr[i] = arr[j];
+41         arr[j] = tmp;
+42     }
+43     
+44 }
+
+
+ 1 public class ArrayList<E> {
+ 2     private transient Object[] elementData;
+ 3     private int size;
+ 4     
+ 5     public E set(int index, E element) {
+ 6         RangeCheck(index);
+ 7 
+ 8         E oldValue = (E) elementData[index];
+ 9         elementData[index] = element;
+10         return oldValue;
+11     }
+12     
+13     private void RangeCheck(int index) {
+14         if (index >= size)
+15             throw new IndexOutOfBoundsException("Index: " + index + ", Size: "
+16                     + size);
+17     }
+18 }
+
+ 
+
+　　经典示例：洗牌算法
+
+
+  1 import java.util.ArrayList;
+  2 import java.util.List;
+  3 import java.util.Random;
+  4 
+  5 public class CollectionsShuffle {
+  6     public static void main(String[] args) {
+  7         List<Card> cards = new ArrayList<Card>();
+  8         // 生成一副牌
+  9         for (int rank = Card.THREE; rank <= Card.DEUCE; rank++) {
+ 10             cards.add(new Card(Card.DIAMOND, rank));
+ 11             cards.add(new Card(Card.CLUB, rank));
+ 12             cards.add(new Card(Card.HEART, rank));
+ 13             cards.add(new Card(Card.SPADE, rank));
+ 14         }
+ 15         cards.add(new Card(Card.JOKER, Card.BLACK));
+ 16         cards.add(new Card(Card.JOKER, Card.COLOR));
+ 17         System.out.println(cards.toString());
+ 18         /*
+ 19          * [方块3, 梅花3, 红桃3, 黑桃3, 方块4, 梅花4, 红桃4, 黑桃4, 方块5, 梅花5, 红桃5, 黑桃5, 方块6,
+ 20          * 梅花6, 红桃6, 黑桃6, 方块7, 梅花7, 红桃7, 黑桃7, 方块8, 梅花8, 红桃8, 黑桃8, 方块9, 梅花9, 红桃9,
+ 21          * 黑桃9, 方块10, 梅花10, 红桃10, 黑桃10, 方块J, 梅花J, 红桃J, 黑桃J, 方块Q, 梅花Q, 红桃Q, 黑桃Q,
+ 22          * 方块K, 梅花K, 红桃K, 黑桃K, 方块A, 梅花A, 红桃A, 黑桃A, 方块2, 梅花2, 红桃2, 黑桃2, 小王, 大王]
+ 23          */
+ 24         // 经典洗牌算法
+ 25         Random random = new Random();
+ 26         for (int i = cards.size(); i > 1; i--) {
+ 27             int m = random.nextInt(i);
+ 28             swap(cards, i - 1, m);
+ 29         }
+ 30         System.out.println(cards.toString());
+ 31         /*
+ 32          * [黑桃7, 黑桃A, 梅花A, 红桃9, 梅花4, 红桃K, 方块5, 梅花7, 梅花6, 方块A, 黑桃Q, 梅花5, 红桃10,
+ 33          * 梅花Q, 梅花J, 方块J, 梅花K, 方块8, 方块6, 方块10, 红桃7, 方块K, 红桃6, 黑桃2, 黑桃K, 梅花10,
+ 34          * 红桃8, 方块Q, 红桃Q, 大王, 梅花3, 梅花2, 方块7, 方块9, 方块4, 红桃3, 梅花9, 红桃J, 黑桃8, 红桃2,
+ 35          * 黑桃6, 红桃A, 黑桃9, 黑桃4, 黑桃J, 黑桃10, 小王, 黑桃3, 黑桃5, 红桃5, 红桃4, 方块2, 方块3, 梅花8]
+ 36          */
+ 37 
+ 38     }
+ 39 
+ 40     public static void swap(List<?> list, int i, int j) {
+ 41         final List l = list;
+ 42         l.set(i, l.set(j, l.get(i)));
+ 43     }
+ 44 }
+ 45 
+ 46 class Card {
+ 47 
+ 48     public static final int DIAMOND = 0; // 方块(钻石)
+ 49     public final static int CLUB = 1; // 梅花
+ 50     public static final int HEART = 2; // 红桃(红心)
+ 51     public static final int SPADE = 3; // 黑桃(花锄)
+ 52     public static final int JOKER = 4; // 王
+ 53 
+ 54     public final static int THREE = 0;
+ 55     public final static int FOUR = 1;
+ 56     public final static int FIVE = 2;
+ 57     public final static int SIX = 3;
+ 58     public final static int SEVEN = 4;
+ 59     public final static int EIGHT = 5;
+ 60     public final static int NINE = 6;
+ 61     public final static int TEN = 7;
+ 62     public final static int JACK = 8;// J
+ 63     public final static int QUEEN = 9;// Q
+ 64     public final static int KING = 10;// K
+ 65     public final static int ACE = 11;// A
+ 66     public final static int DEUCE = 12; // 2
+ 67     public final static int BLACK = 13; // 小王
+ 68     public final static int COLOR = 14;// 大王
+ 69 
+ 70     /** 花色 0代表方块, 1代表梅花, 2代表红桃, 3代表黑桃,4:王 */
+ 71     private int suit;
+ 72     /** 点数 规定: 0代表3, 1代表4, 2代表5,... */
+ 73     private int rank;
+ 74 
+ 75     public Card() {
+ 76     }
+ 77 
+ 78     public Card(int suit, int rank) {
+ 79         // this.rank = rank;
+ 80         // this.suit = suit;
+ 81         setRank(rank);
+ 82         setSuit(suit);
+ 83     }
+ 84 
+ 85     public int getSuit() {
+ 86         return suit;
+ 87     }
+ 88 
+ 89     public void setSuit(int suit) {
+ 90         if (suit < DIAMOND || suit > JOKER)
+ 91             throw new RuntimeException("花色超过范围!");
+ 92         this.suit = suit;
+ 93     }
+ 94 
+ 95     public int getRank() {
+ 96         return rank;
+ 97     }
+ 98 
+ 99     public void setRank(int rank) {
+100         if (rank < THREE || rank > COLOR) {
+101             throw new RuntimeException("点数超过范围!");
+102         }
+103         this.rank = rank;
+104     }
+105 
+106     private static final String[] RANK_NAMES = { "3", "4", "5", "6", "7", "8",
+107             "9", "10", "J", "Q", "K", "A", "2", "小王", "大王" };
+108     private static final String[] SUIT_NAMES = { "方块", "梅花", "红桃", "黑桃", "" };
+109 
+110     // 覆盖Object 类的toStirng() 方法. 实现对象的文本描述
+111     public String toString() {
+112         return SUIT_NAMES[suit] + RANK_NAMES[rank];
+113     }
+114 
+115     public boolean equals(Object obj) {
+116         if (obj == null) {
+117             return false;
+118         }
+119         if (this == obj) {
+120             return true;
+121         }
+122         if (obj instanceof Card) {
+123             Card other = (Card) obj;
+124             return this.rank == other.rank && this.suit == other.suit;
+125         }
+126         return false;
+127     }
+128 
+129     public int hashCode() {
+130         // return suit*100+rank;
+131         // suit=3= 00000000 00000000 00000000 00000011
+132         // rank=10=00000000 00000000 00000000 00000011
+133         // suit<<16=00000000 00000011 00000000 00000000
+134         // 00000000 00000011 00000000 00000011
+135         return (suit << 16) + rank;// (x<<16)+y
+136     }
+137 }
